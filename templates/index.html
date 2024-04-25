@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Time Tracker</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        html, body {
+            height: 100%; /* Ensure HTML and body take up the entire viewport height */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+        body {
+            background: linear-gradient(to bottom, #CDF0EA, #F9F9F9, #F7DBF0, #BEAEE2);
+            color: #343a40;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; /* Use flexbox for layout */
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+        }
+        .container {
+            max-width: 600px; /* Limit content width */
+            padding: 20px; /* Add padding */
+            background-color: rgba(255, 255, 255, 0.8); /* Set container background with opacity */
+            border-radius: 10px; /* Add border radius */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box shadow */
+        }
+        .btn {
+            margin-top: 10px;
+            background-color: #F9F9F9; /* Button background color */
+            border-color: #F9F9F9; /* Button border color */
+            color: #343a40; /* Button text color */
+        }
+        .btn:hover {
+            background-color: #BEAEE2; /* Button background color on hover */
+            border-color: #BEAEE2; /* Button border color on hover */
+            color: #F9F9F9; /* Button text color on hover */
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-4">
+            <img src="static/You.gif" alt="Website Time Tracker" class="img-fluid">
+            <h1 class="mt-3">Website Time Tracker</h1>
+            <p class="lead">Track your time spent on websites</p>
+        </div>
+
+
+        <div id="status" class="alert alert-info" style="display: none;"></div>
+
+        <button id="startButton" class="btn btn-lg btn-block">Start Tracking</button>
+        <button id="stopButton" class="btn btn-lg btn-block">Stop Tracking</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById("startButton").addEventListener("click", function() {
+            fetch("/start_tracking", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("status").innerText = data.message;
+                document.getElementById("status").style.display = "block";
+            });
+        });
+
+        document.getElementById("stopButton").addEventListener("click", function() {
+            fetch("/stop_tracking", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("status").innerText = data.message;
+                document.getElementById("status").style.display = "block";
+                updateResult(data);
+            });
+        });
+
+        // Function to update result display
+        function updateResult(data) {
+            let resultHtml = "<h2>Tracking Results:</h2><ul>";
+            for (let website in data) {
+                if (data.hasOwnProperty(website)) {  // Ensure it's a direct property
+                    resultHtml += "<li>" + website + ": " + data[website] + " seconds</li>";
+                }
+            }
+            resultHtml += "</ul>";
+            document.getElementById("result").innerHTML = resultHtml;
+        }
+    </script>
+</body>
+</html>
